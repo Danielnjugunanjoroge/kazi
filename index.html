@@ -90,35 +90,81 @@
       display: block;
     }
 
-    .cart {
-      position: relative;
-      font-size: 22px;
-      cursor: pointer;
-    }
-
-    .cart-count {
-      position: absolute;
-      top: -10px;
-      right: -10px;
-      background: red;
+    /* --- HERO SECTION --- */
+    .hero {
+      background: url('https://images.unsplash.com/photo-1510552776732-03e61cf4b144?auto=format&fit=crop&w=1200&q=80') no-repeat center center/cover;
       color: white;
-      font-size: 14px;
-      border-radius: 50%;
-      padding: 2px 6px;
+      text-align: center;
+      padding: 120px 20px;
+      position: relative;
     }
 
-    .content {
+    .hero::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 700px;
+      margin: auto;
+    }
+
+    .hero h1 {
+      font-size: 42px;
+      color: #ffcc00;
+      margin-bottom: 15px;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: #fff;
+      line-height: 1.6;
+    }
+
+    /* --- FEATURES SECTION --- */
+    .features {
       display: flex;
       flex-wrap: wrap;
+      justify-content: center;
       gap: 20px;
+      padding: 40px 20px;
+      background: #fff;
+    }
+
+    .feature-box {
+      background: #f9f9f9;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       padding: 20px;
+      text-align: center;
+      flex: 1;
+      min-width: 220px;
+      max-width: 280px;
+    }
+
+    .feature-box h3 {
+      color: #111;
+      margin-bottom: 10px;
+    }
+
+    .feature-box p {
+      color: #555;
+      font-size: 15px;
+    }
+
+    /* --- PRODUCT SECTION --- */
+    .content {
+      padding: 40px 20px;
     }
 
     #product-list {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 20px;
-      flex: 3;
     }
 
     .product {
@@ -155,51 +201,9 @@
       color: #111;
     }
 
-    /* Cart Sidebar */
-    .cart-sidebar {
-      background: white;
-      flex: 1;
-      border-radius: 12px;
-      padding: 15px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      position: sticky;
-      top: 20px;
-      height: fit-content;
-    }
-
-    .cart-sidebar h3 {
-      text-align: center;
-    }
-
-    .cart-items {
-      list-style: none;
-      padding: 0;
-      max-height: 300px;
-      overflow-y: auto;
-    }
-
-    .checkout-btn {
-      background: #28a745;
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    .checkout-btn:hover {
-      background: #218838;
-    }
-
     @media screen and (max-width: 800px) {
-      .content {
+      .features {
         flex-direction: column;
-      }
-      .cart-sidebar {
-        width: 100%;
       }
     }
   </style>
@@ -207,7 +211,7 @@
 
 <body>
   <header>3D TRADERS LIMITED</header>
-  <div class="marquee"><p>Welcome to 3D TRADERS LIMITED — Your trusted trading partner!</p></div>
+  <div class="marquee"><p>Welcome to 3D TRADERS LIMITED — Your trusted electronics partner!</p></div>
 
   <div class="menu">
     <div class="dropdown">
@@ -220,34 +224,58 @@
         <a href="cart.html">Cart</a>
       </div>
     </div>
-    <div class="cart">🛒 <span class="cart-count">0</span></div>
   </div>
 
-  <div class="content">
-    <div id="product-list"></div>
-
-    <div class="cart-sidebar">
-      <h3>Your Cart</h3>
-      <ul id="cart-items" class="cart-items"></ul>
-      <button class="checkout-btn" onclick="checkout()">Checkout</button>
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Welcome to ONE STOP ELECTRONICS</h1>
+      <p>Your go-to shop for quality gadgets, affordable prices, and trusted service.  
+      Explore our collection of electronics built to power your everyday life.</p>
     </div>
-  </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="feature-box">
+      <h3>💡 Quality Gadgets</h3>
+      <p>We bring you only the best — from phones and laptops to accessories you can rely on.</p>
+    </div>
+    <div class="feature-box">
+      <h3>⚡ Affordable Prices</h3>
+      <p>Top electronics at fair prices — value you can count on every time.</p>
+    </div>
+    <div class="feature-box">
+      <h3>🚚 Fast Delivery</h3>
+      <p>We deliver your products quickly and safely to your doorstep.</p>
+    </div>
+    <div class="feature-box">
+      <h3>💬 Great Support</h3>
+      <p>Need help? Our team is always ready to assist you anytime, anywhere.</p>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="content">
+    <div id="product-list"></div>
+  </section>
 
   <script>
     const productList = document.getElementById('product-list');
-    const cartList = document.getElementById('cart-items');
-    const cartCount = document.querySelector('.cart-count');
     let cart = [];
     let total = 0;
     let isAdmin = false;
 
-    // Load products from localStorage
     function loadProducts() {
       const products = JSON.parse(localStorage.getItem("products")) || [];
       productList.innerHTML = "";
 
       if (products.length === 0) {
-        productList.innerHTML = `<p style="text-align:center;">No products available yet. Admin can add from stock.html</p>`;
+        // If no products, show friendly message instead of empty space
+        productList.innerHTML = `
+          <p style="text-align:center; font-size:18px; color:#555; margin-top:20px;">
+            No products available yet. Visit our <a href="stock.html" style="color:#ffcc00; font-weight:bold;">stock page</a> to add some!
+          </p>`;
         return;
       }
 
@@ -267,37 +295,15 @@
       });
     }
 
-    // Add to cart
     function addToCart(index) {
       const products = JSON.parse(localStorage.getItem("products")) || [];
       const selected = products[index];
       cart.push(selected);
       total += parseFloat(selected.price);
-      updateCart();
+      localStorage.setItem("cart", JSON.stringify(cart));
+      alert(`${selected.name} added to cart!`);
     }
 
-    // Update cart display
-    function updateCart() {
-      cartList.innerHTML = "";
-      cart.forEach(item => {
-        const li = document.createElement("li");
-        li.textContent = `${item.name} - Ksh ${item.price}`;
-        cartList.appendChild(li);
-      });
-      cartCount.textContent = cart.length;
-    }
-
-    // Checkout
-    function checkout() {
-      if (cart.length === 0) {
-        alert("Your cart is empty!");
-        return;
-      }
-      localStorage.setItem("cartTotal", total);
-      window.location.href = "payment.html";
-    }
-
-    // Admin login
     function adminLogin() {
       const pass = prompt("Enter admin password:");
       if (pass === "admin123") {
@@ -306,26 +312,6 @@
         loadProducts();
       } else {
         alert("Incorrect password!");
-      }
-    }
-
-    // Delete product (admin only)
-    function deleteProduct(index) {
-      if (confirm("Delete this product?")) {
-        let products = JSON.parse(localStorage.getItem("products")) || [];
-        products.splice(index, 1);
-        localStorage.setItem("products", JSON.stringify(products));
-        loadProducts();
-      }
-    }
-
-    // Access stock page
-    function openStock() {
-      const password = prompt("Enter admin password to access stock page:");
-      if (password === "admin123") {
-        window.location.href = "stock.html";
-      } else {
-        alert("Access denied!");
       }
     }
 
