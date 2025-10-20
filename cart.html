@@ -1,54 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Cart - ONE STOP</title>
-  <link rel="stylesheet" href="styles.css">
-  <script>
-    function loadCart() {
-      let cart = JSON.parse(localStorage.getItem("one_stop_cart")) || [];
-      let container = document.getElementById("cartItems");
-      container.innerHTML = "";
-      let total = 0;
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cart - ONE STOP</title>
 
-      if (cart.length === 0) {
-        container.innerHTML = "<p>Your cart is empty.</p>";
-      } else {
-        cart.forEach((item, index) => {
-          total += item.price;
-          container.innerHTML += `
-            <div class="cart-item">
-              <p>${item.name} - $${item.price}</p>
-              <button onclick="removeItem(${index})">Remove</button>
-            </div>`;
-        });
-      }
-      document.getElementById("total").textContent = "Total: $" + total;
+  <!-- Embedded CSS that follows same palette & standards -->
+  <style>
+    :root{
+      --dark:#111;
+      --accent:#2E8B57;
+      --accent-dark:#256b4a;
+      --muted:#f4f6f8;
+      --card:#fff;
+      --danger:#c0392b;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:var(--muted);
+      color:#222;
     }
 
-    function removeItem(index) {
-      let cart = JSON.parse(localStorage.getItem("one_stop_cart")) || [];
-      cart.splice(index, 1);
-      localStorage.setItem("one_stop_cart", JSON.stringify(cart));
-      loadCart();
-    }
+    header.site-header{ background:var(--dark); color:#fff; padding:12px 18px; }
+    .top-nav{ max-width:1100px; margin:0 auto; display:flex; gap:12px; align-items:center; }
+    .top-nav a{ color:#ddd; text-decoration:none; padding:6px 8px; border-radius:4px; }
+    .top-nav a:hover{ background:#222; color:#fff; }
 
-    function clearCart() {
-      localStorage.removeItem("one_stop_cart");
-      loadCart();
-    }
+    main{ max-width:1100px; margin:20px auto; padding:0 16px; }
+    h1{ margin-bottom:10px; color:var(--dark); }
 
-    window.onload = loadCart;
-  </script>
+    .cart-table{ width:100%; border-collapse:collapse; background:var(--card); border-radius:8px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.06); }
+    .cart-table th, .cart-table td{ padding:12px 10px; text-align:left; border-bottom:1px solid #f0f0f0; }
+    .cart-table thead{ background:#fafafa; font-weight:700; }
+    .cart-item-img{ width:72px; height:72px; object-fit:cover; border-radius:6px; }
+
+    .actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:12px; }
+    .btn{ padding:8px 12px; border-radius:6px; border:0; cursor:pointer; font-weight:700; }
+    .btn-remove{ background:var(--danger); color:white; }
+    .btn-clear{ background:#bdc3c7; color:#111; }
+    .btn-checkout{ background:var(--accent); color:white; }
+
+    .summary{ margin-top:10px; display:flex; justify-content:flex-end; gap:20px; align-items:center; font-size:1.05rem; font-weight:700; }
+    @media (max-width:600px){
+      .cart-table thead{ display:none; }
+      .cart-table tr{ display:block; margin-bottom:12px; }
+      .cart-table td{ display:flex; justify-content:space-between; }
+    }
+  </style>
 </head>
 <body>
-  <h2>Your Cart</h2>
-  <div id="cartItems"></div>
-  <h3 id="total"></h3>
+  <header class="site-header">
+    <nav class="top-nav">
+      <a href="index.html">Home</a>
+      <a href="front.html">Front</a>
+      <a href="stock.html">Stock</a>
+      <a href="product.html">Products</a>
+      <a href="cart.html">Cart</a>
+      <a href="payment.html">Payment</a>
+    </nav>
+  </header>
 
-  <button onclick="clearCart()">Clear Cart</button>
-  <a href="payment.html"><button>Proceed to Payment</button></a>
-  <a href="product.html">Back to Products</a>
+  <main>
+    <h1>Your Cart</h1>
+
+    <table class="cart-table" aria-live="polite">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th style="width:140px;">Price</th>
+          <th style="width:120px;">Action</th>
+        </tr>
+      </thead>
+      <tbody id="cartBody">
+        <!-- rows inserted by JS -->
+      </tbody>
+    </table>
+
+    <div class="summary">
+      <div id="totalAmount">Total: Ksh 0</div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-clear" onclick="clearCart()">Clear Cart</button>
+      <button class="btn btn-checkout" onclick="proceed()">Proceed to Payment</button>
+    </div>
+
+    <div style="margin-top:18px;">
+      <a href="product.html" style="text-decoration:none;color:var(--accent);font-weight:700;">← Continue shopping</a>
+    </div>
+  </main>
+
+  <script>
+    const CART_KEY = 'one_stop_cart';
+    function getCart(){ try{ return JSON.parse(localStorage.getItem(CART_KEY)) || []; }catch(e){ return []; } }
+    function saveCart(c){ localStorage.setItem(CART_KEY, JSON.stringify(c)); renderCart(); }
+
+    function renderCart(){
+      const body = document.getElementById('cartBody');
+      const totalEl = document.getElementById('totalAmount');
+      const cart = getCart();
+      body.innerHTML = '';
+      let total = 0;
+      if(cart.length === 0){
+        body.innerHTML = `<tr><td colspan="3" style="padding:14px;text-align:center;">Your cart is empty.</td></tr>`;
+      } else {
+        cart.forEach(item => {
+          total += Number(item.price);
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td style="display:flex;gap:12px;align-items:center;">
+              <img src="${item.img}" class="cart-item-img" alt="${item.name}">
+              <div>
+                <div style="font-weight:700;">${item.name}</div>
+              </div>
+            </td>
+            <td>Ksh ${item.price}</td>
+            <td><button class="btn btn-remove" onclick="removeItem(${item.id})">Remove</button></td>
+          `;
+          body.appendChild(tr);
+        });
+      }
+      totalEl.textContent = 'Total: Ksh ' + total;
+    }
+
+    function removeItem(id){
+      let cart = getCart();
+      cart = cart.filter(i => i.id !== id);
+      saveCart(cart);
+    }
+
+    function clearCart(){
+      if(!confirm('Clear entire cart?')) return;
+      saveCart([]);
+    }
+
+    function proceed(){
+      const cart = getCart();
+      if(cart.length === 0){ alert('Your cart is empty'); return; }
+      // redirect to payment page (you already have payment.html)
+      window.location.href = 'payment.html';
+    }
+
+    // init render on load
+    renderCart();
+  </script>
 </body>
 </html>
