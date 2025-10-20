@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Cart - ONE STOP</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    function loadCart() {
+      let cart = JSON.parse(localStorage.getItem("one_stop_cart")) || [];
+      let container = document.getElementById("cartItems");
+      container.innerHTML = "";
+      let total = 0;
+
+      if (cart.length === 0) {
+        container.innerHTML = "<p>Your cart is empty.</p>";
+      } else {
+        cart.forEach((item, index) => {
+          total += item.price;
+          container.innerHTML += `
+            <div class="cart-item">
+              <p>${item.name} - $${item.price}</p>
+              <button onclick="removeItem(${index})">Remove</button>
+            </div>`;
+        });
+      }
+      document.getElementById("total").textContent = "Total: $" + total;
+    }
+
+    function removeItem(index) {
+      let cart = JSON.parse(localStorage.getItem("one_stop_cart")) || [];
+      cart.splice(index, 1);
+      localStorage.setItem("one_stop_cart", JSON.stringify(cart));
+      loadCart();
+    }
+
+    function clearCart() {
+      localStorage.removeItem("one_stop_cart");
+      loadCart();
+    }
+
+    window.onload = loadCart;
+  </script>
+</head>
+<body>
+  <h2>Your Cart</h2>
+  <div id="cartItems"></div>
+  <h3 id="total"></h3>
+
+  <button onclick="clearCart()">Clear Cart</button>
+  <a href="payment.html"><button>Proceed to Payment</button></a>
+  <a href="product.html">Back to Products</a>
+</body>
+</html>
