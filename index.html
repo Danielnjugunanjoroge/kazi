@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D TRADERS LIMITED</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f8f8f8;
+      overflow-x: hidden;
+    }
+
+    header {
+      background-color: #111;
+      color: white;
+      padding: 15px 0;
+      text-align: center;
+      font-size: 28px;
+      letter-spacing: 2px;
+      font-weight: bold;
+    }
+
+    .marquee {
+      background: #ffcc00;
+      color: #111;
+      padding: 10px 0;
+      font-weight: bold;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .marquee p {
+      display: inline-block;
+      animation: scroll 15s linear infinite;
+      margin: 0;
+    }
+
+    @keyframes scroll {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    .menu {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #333;
+      color: white;
+      padding: 10px 20px;
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropbtn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #333;
+      min-width: 160px;
+      border-radius: 8px;
+      z-index: 1;
+    }
+
+    .dropdown-content a {
+      color: white;
+      padding: 10px 14px;
+      text-decoration: none;
+      display: block;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #ffcc00;
+      color: #111;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .cart {
+      position: relative;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .cart-count {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: red;
+      color: white;
+      font-size: 14px;
+      border-radius: 50%;
+      padding: 2px 6px;
+    }
+
+    .content {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    #product-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      flex: 3;
+    }
+
+    .product {
+      background: white;
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .product img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .product-info {
+      margin-top: 10px;
+    }
+
+    .product button {
+      background: #333;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      margin-top: 5px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .product button:hover {
+      background: #ffcc00;
+      color: #111;
+    }
+
+    /* Cart Sidebar */
+    .cart-sidebar {
+      background: white;
+      flex: 1;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      position: sticky;
+      top: 20px;
+      height: fit-content;
+    }
+
+    .cart-sidebar h3 {
+      text-align: center;
+    }
+
+    .cart-items {
+      list-style: none;
+      padding: 0;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .checkout-btn {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .checkout-btn:hover {
+      background: #218838;
+    }
+
+    @media screen and (max-width: 800px) {
+      .content {
+        flex-direction: column;
+      }
+      .cart-sidebar {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>3D TRADERS LIMITED</header>
+  <div class="marquee"><p>Welcome to 3D TRADERS LIMITED — Your trusted trading partner!</p></div>
+
+  <div class="menu">
+    <div class="dropdown">
+      <button class="dropbtn">☰ Menu</button>
+      <div class="dropdown-content">
+        <a href="#">Home</a>
+        <a href="#">Products</a>
+        <a href="#" onclick="openStock()">Stock</a>
+        <a href="#" onclick="adminLogin()">Admin Login</a>
+      </div>
+    </div>
+    <div class="cart">🛒 <span class="cart-count">0</span></div>
+  </div>
+
+  <div class="content">
+    <div id="product-list"></div>
+
+    <div class="cart-sidebar">
+      <h3>Your Cart</h3>
+      <ul id="cart-items" class="cart-items"></ul>
+      <button class="checkout-btn" onclick="checkout()">Checkout</button>
+    </div>
+  </div>
+
+  <script>
+    const productList = document.getElementById('product-list');
+    const cartList = document.getElementById('cart-items');
+    const cartCount = document.querySelector('.cart-count');
+    let cart = [];
+    let total = 0;
+    let isAdmin = false;
+
+    // Load products from localStorage
+    function loadProducts() {
+      const products = JSON.parse(localStorage.getItem("products")) || [];
+      productList.innerHTML = "";
+
+      if (products.length === 0) {
+        productList.innerHTML = `<p style="text-align:center;">No products available yet. Admin can add from stock.html</p>`;
+        return;
+      }
+
+      products.forEach((p, index) => {
+        const div = document.createElement('div');
+        div.classList.add('product');
+        div.innerHTML = `
+          <img src="${p.img}" alt="${p.name}">
+          <div class="product-info">
+            <h3>${p.name}</h3>
+            <p>Ksh ${p.price}</p>
+            <button onclick="addToCart(${index})">Add to Cart</button>
+            ${isAdmin ? `<button style="background:red;" onclick="deleteProduct(${index})">🗑 Delete</button>` : ""}
+          </div>
+        `;
+        productList.appendChild(div);
+      });
+    }
+
+    // Add to cart
+    function addToCart(index) {
+      const products = JSON.parse(localStorage.getItem("products")) || [];
+      const selected = products[index];
+      cart.push(selected);
+      total += parseFloat(selected.price);
+      updateCart();
+    }
+
+    // Update cart display
+    function updateCart() {
+      cartList.innerHTML = "";
+      cart.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.name} - Ksh ${item.price}`;
+        cartList.appendChild(li);
+      });
+      cartCount.textContent = cart.length;
+    }
+
+    // Checkout
+    function checkout() {
+      if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+      }
+      localStorage.setItem("cartTotal", total);
+      window.location.href = "payment.html";
+    }
+
+    // Admin login
+    function adminLogin() {
+      const pass = prompt("Enter admin password:");
+      if (pass === "admin123") {
+        isAdmin = true;
+        alert("Admin mode activated!");
+        loadProducts();
+      } else {
+        alert("Incorrect password!");
+      }
+    }
+
+    // Delete product (admin only)
+    function deleteProduct(index) {
+      if (confirm("Delete this product?")) {
+        let products = JSON.parse(localStorage.getItem("products")) || [];
+        products.splice(index, 1);
+        localStorage.setItem("products", JSON.stringify(products));
+        loadProducts();
+      }
+    }
+
+    // Access stock page
+    function openStock() {
+      const password = prompt("Enter admin password to access stock page:");
+      if (password === "admin123") {
+        window.location.href = "stock.html";
+      } else {
+        alert("Access denied!");
+      }
+    }
+
+    window.onload = loadProducts;
+  </script>
+</body>
+</html>
