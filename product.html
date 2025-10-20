@@ -1,51 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Products - ONE STOP</title>
-  <link rel="stylesheet" href="styles.css">
-  <script>
-    function addToCart(name, price) {
-      let cart = JSON.parse(localStorage.getItem("one_stop_cart")) || [];
-      cart.push({ name, price });
-      localStorage.setItem("one_stop_cart", JSON.stringify(cart));
-      alert(name + " added to cart!");
+
+  <!-- Inline CSS to keep styling self-contained and consistent with your theme -->
+  <style>
+    :root{
+      --dark:#111;        /* header */
+      --accent:#2E8B57;   /* green accent seen in front.html */
+      --muted:#f4f6f8;
+      --card-bg:#fff;
+      --text:#222;
+      --accent-dark:#256b4a;
     }
-  </script>
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:var(--muted);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+    }
+
+    /* header / nav like your existing pages */
+    header.site-header{
+      background:var(--dark);
+      color:white;
+      padding:12px 18px;
+    }
+    .top-nav{
+      max-width:1100px;
+      margin:0 auto;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      font-weight:600;
+    }
+    .top-nav a{
+      color: #ddd;
+      text-decoration:none;
+      padding:6px 8px;
+      border-radius:4px;
+      transition: background .15s, color .15s;
+    }
+    .top-nav a:hover{ background:#222; color:#fff; }
+
+    main{ max-width:1100px; margin:22px auto; padding:0 16px; }
+
+    h1{ text-align:left; color:var(--dark); margin:6px 0 14px; }
+
+    /* product grid */
+    .product-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap:18px;
+    }
+
+    .product-card{
+      background:var(--card-bg);
+      border-radius:10px;
+      padding:12px;
+      box-shadow:0 4px 8px rgba(0,0,0,0.07);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      text-align:center;
+    }
+
+    .product-card img{
+      width:100%;
+      height:160px;
+      object-fit:cover; /* keeps your original crop/visibility */
+      border-radius:8px;
+      display:block;
+      margin-bottom:10px;
+    }
+
+    .product-card h3{ margin:6px 0; font-size:1.05rem; color:var(--dark); }
+    .product-card p.price{ margin:0 0 10px; font-weight:700; color:var(--accent); }
+
+    .product-card button{
+      background:var(--accent);
+      color:white;
+      border:0;
+      padding:8px 12px;
+      border-radius:6px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .product-card button:hover{ background:var(--accent-dark); }
+
+    /* cart preview box */
+    .cart-preview{
+      margin-top:22px;
+      background:var(--card-bg);
+      border-radius:8px;
+      padding:12px;
+      box-shadow:0 3px 6px rgba(0,0,0,0.05);
+    }
+    .cart-preview ul{ list-style:none; padding:0; margin:0; max-height:220px; overflow:auto; }
+    .cart-preview li{ padding:8px 6px; border-bottom:1px solid #efefef; display:flex; justify-content:space-between; align-items:center; }
+    .cart-preview .small-img{ width:48px; height:48px; object-fit:cover; border-radius:6px; margin-right:10px; }
+
+    .bottom-links{ margin-top:12px; display:flex; justify-content:flex-end; gap:10px; }
+    .btn-link{
+      background:transparent; border:1px solid #ccc; padding:6px 10px; border-radius:6px; text-decoration:none; color:var(--dark); font-weight:600;
+    }
+    .btn-primary{
+      background:var(--accent); color:white; padding:8px 12px; border-radius:6px; border:0; text-decoration:none; cursor:pointer;
+    }
+
+    @media (max-width:480px){
+      .top-nav{ font-size:14px; gap:8px; }
+      .product-card img{ height:140px; }
+    }
+  </style>
 </head>
 <body>
-  <h2>Available Products</h2>
-  <div class="product-container">
-    <div class="product">
-      <img src="https://via.placeholder.com/150" alt="Shirt">
-      <h3>Classic Shirt</h3>
-      <p>Price: $25</p>
-      <button onclick="addToCart('Classic Shirt', 25)">Add to Cart</button>
+  <header class="site-header">
+    <nav class="top-nav">
+      <a href="index.html">Home</a>
+      <a href="front.html">Front</a>
+      <a href="stock.html">Stock</a>
+      <a href="product.html">Products</a>
+      <a href="cart.html">Cart</a>
+      <a href="payment.html">Payment</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Products</h1>
+
+    <div class="product-grid">
+      <!-- use your provided image filenames so they appear exactly as in your folder -->
+      <div class="product-card">
+        <img src="image1.jpg" alt="Classic Shirt">
+        <h3>Classic Shirt</h3>
+        <p class="price">Ksh 1200</p>
+        <button onclick="addToCart('Classic Shirt',1200,'image1.jpg')">Add to Cart</button>
+      </div>
+
+      <div class="product-card">
+        <img src="image2.jpg" alt="Stylish Shoes">
+        <h3>Stylish Shoes</h3>
+        <p class="price">Ksh 2500</p>
+        <button onclick="addToCart('Stylish Shoes',2500,'image2.jpg')">Add to Cart</button>
+      </div>
+
+      <div class="product-card">
+        <img src="image3 - Copy.jpg" alt="Leather Watch">
+        <h3>Leather Watch</h3>
+        <p class="price">Ksh 1800</p>
+        <button onclick="addToCart('Leather Watch',1800,'image3 - Copy.jpg')">Add to Cart</button>
+      </div>
+
+      <div class="product-card">
+        <img src="Image4.jpg" alt="Travel Bag">
+        <h3>Travel Bag</h3>
+        <p class="price">Ksh 3200</p>
+        <button onclick="addToCart('Travel Bag',3200,'Image4.jpg')">Add to Cart</button>
+      </div>
     </div>
 
-    <div class="product">
-      <img src="https://via.placeholder.com/150" alt="Shoes">
-      <h3>Sport Shoes</h3>
-      <p>Price: $40</p>
-      <button onclick="addToCart('Sport Shoes', 40)">Add to Cart</button>
-    </div>
+    <section class="cart-preview">
+      <h3>Cart Preview</h3>
+      <ul id="cartPreview"></ul>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+        <div id="previewCount">Items: 0</div>
+        <div id="previewTotal">Total: Ksh 0</div>
+      </div>
+      <div class="bottom-links">
+        <a class="btn-link" href="stock.html">Back to Stock</a>
+        <a class="btn-primary" href="cart.html">Go to Cart</a>
+      </div>
+    </section>
+  </main>
 
-    <div class="product">
-      <img src="https://via.placeholder.com/150" alt="Watch">
-      <h3>Stylish Watch</h3>
-      <p>Price: $30</p>
-      <button onclick="addToCart('Stylish Watch', 30)">Add to Cart</button>
-    </div>
+  <script>
+    const CART_KEY = 'one_stop_cart';
 
-    <div class="product">
-      <img src="https://via.placeholder.com/150" alt="Bag">
-      <h3>Leather Bag</h3>
-      <p>Price: $50</p>
-      <button onclick="addToCart('Leather Bag', 50)">Add to Cart</button>
-    </div>
-  </div>
+    function getCart(){ 
+      try{ return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch(e){ return []; }
+    }
+    function saveCart(c){ localStorage.setItem(CART_KEY, JSON.stringify(c)); renderPreview(); }
 
-  <a href="cart.html">Go to Cart</a>
+    function addToCart(name, price, img){
+      const cart = getCart();
+      cart.push({ id: Date.now(), name, price: Number(price), img });
+      saveCart(cart);
+      // slight friendly feedback
+      setTimeout(()=>{ alert(name + ' added to cart'); }, 50);
+    }
+
+    function renderPreview(){
+      const list = document.getElementById('cartPreview');
+      const totalEl = document.getElementById('previewTotal');
+      const countEl = document.getElementById('previewCount');
+      const cart = getCart();
+      list.innerHTML = '';
+      let total = 0;
+      cart.forEach(item => {
+        total += Number(item.price);
+        const li = document.createElement('li');
+        li.style.display = 'flex';
+        li.style.alignItems = 'center';
+        li.style.justifyContent = 'space-between';
+        const left = document.createElement('div');
+        left.style.display='flex'; left.style.alignItems='center';
+        const img = document.createElement('img'); img.src = item.img; img.className='small-img';
+        left.appendChild(img);
+        const txt = document.createElement('div'); txt.textContent = item.name + ' — Ksh ' + item.price;
+        left.appendChild(txt);
+        li.appendChild(left);
+        list.appendChild(li);
+      });
+      totalEl.textContent = 'Total: Ksh ' + total;
+      countEl.textContent = 'Items: ' + cart.length;
+    }
+
+    // init
+    renderPreview();
+  </script>
 </body>
 </html>
