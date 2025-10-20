@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment - 3D TRADERS LIMITED</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .payment-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      width: 400px;
+      padding: 25px;
+      text-align: center;
+    }
+    h2 {
+      color: #111;
+    }
+    input, select, button {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background: #333;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #ffcc00;
+      color: #111;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="payment-container">
+    <h2>Payment Details</h2>
+    <p id="total"></p>
+
+    <!-- Step 1: Email Verification -->
+    <div id="step1">
+      <input type="email" id="email" placeholder="Enter your email" required>
+      <button onclick="verifyEmail()">Verify Email</button>
+    </div>
+
+    <!-- Step 2: Payment Method -->
+    <div id="step2" class="hidden">
+      <label>Select Payment Method:</label><br>
+      <select id="method">
+        <option value="">--Choose--</option>
+        <option value="mpesa">M-Pesa</option>
+        <option value="bank">Bank</option>
+      </select>
+      <button onclick="proceedToNumber()">Proceed</button>
+    </div>
+
+    <!-- Step 3: Number Entry -->
+    <div id="step3" class="hidden">
+      <label id="numberLabel">Enter your number:</label><br>
+      <input type="text" id="number" placeholder="Enter your Mpesa or Bank number">
+      <button onclick="completeTransaction()">Complete Payment</button>
+    </div>
+  </div>
+
+  <script>
+    const totalDisplay = document.getElementById("total");
+    const step1 = document.getElementById("step1");
+    const step2 = document.getElementById("step2");
+    const step3 = document.getElementById("step3");
+    const numberLabel = document.getElementById("numberLabel");
+    const total = localStorage.getItem("cartTotal") || 0;
+
+    totalDisplay.textContent = `Total Amount: Ksh ${total}`;
+
+    // ✅ Step 1: Verify Email
+    function verifyEmail() {
+      const email = document.getElementById("email").value.trim();
+      const emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+
+      if (!email.match(emailPattern)) {
+        alert("⚠️ Please enter a valid email address!");
+        return;
+      }
+
+      alert("✅ Email verified successfully!");
+      step1.classList.add("hidden");
+      step2.classList.remove("hidden");
+    }
+
+    // ✅ Step 2: Choose Method
+    function proceedToNumber() {
+      const method = document.getElementById("method").value;
+      if (method === "") {
+        alert("Please select a payment method first!");
+        return;
+      }
+
+      if (method === "mpesa") {
+        numberLabel.textContent = "Enter your M-Pesa number:";
+        document.getElementById("number").placeholder = "07XXXXXXXX";
+      } else {
+        numberLabel.textContent = "Enter your Bank Account number:";
+        document.getElementById("number").placeholder = "Bank Account Number";
+      }
+
+      alert(`You chose ${method.toUpperCase()} method.`);
+      step2.classList.add("hidden");
+      step3.classList.remove("hidden");
+    }
+
+    // ✅ Step 3: Complete Payment
+    function completeTransaction() {
+      const number = document.getElementById("number").value.trim();
+      if (number === "" || number.length < 6) {
+        alert("⚠️ Enter a valid number to proceed!");
+        return;
+      }
+
+      alert(`A confirmation message has been sent to ${number}.
+Please enter your PIN to complete payment of Ksh ${total}.`);
+      setTimeout(() => {
+        alert("✅ Transaction completed successfully! Thank you for shopping with 3D TRADERS LIMITED.");
+        localStorage.removeItem("cartTotal");
+        window.location.href = "index.html";
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
