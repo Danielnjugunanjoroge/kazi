@@ -144,20 +144,26 @@ function loadReceipt(){
   const trx = document.getElementById("trxId");
 
   body.innerHTML = "";
+  let total = 0;
+
   if(!receipt.items || receipt.items.length===0){
     body.innerHTML = `<tr><td colspan="2" style="text-align:center;">No items found</td></tr>`;
   } else {
-    let total = 0;
     receipt.items.forEach(item=>{
-      total += Number(item.price) * Number(item.qty);
+      let qty = Number(item.qty || 1);
+      let price = Number(item.price || 0);
+      total += price * qty;
+
       const row = document.createElement("tr");
-      row.innerHTML = `<td><img src="${item.img}" class="item-img"> ${item.name}</td>
-                       <td>Ksh ${Number(item.price)*Number(item.qty)}</td>`;
+      row.innerHTML = `
+        <td><img src="${item.img}" class="item-img"> ${item.name}</td>
+        <td>Ksh ${price * qty}</td>
+      `;
       body.appendChild(row);
     });
-    totalEl.textContent = "Total Paid: Ksh " + total;
   }
 
+  totalEl.textContent = "Total Paid: Ksh " + total;
   methodEl.textContent = receipt.method || "N/A";
   emailEl.textContent = receipt.email || "Not Provided";
   dateEl.textContent = receipt.date || new Date().toLocaleString();
