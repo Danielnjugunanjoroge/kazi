@@ -1,204 +1,160 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Payment - ONE STOP</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment - ONE STOP</title>
 
-<style>
+  <style>
     :root{
-        --dark:#111;
-        --accent:#2E8B57;
-        --accent-dark:#256b4a;
-        --muted:#f4f6f8;
-        --card:#fff;
-        --danger:#c0392b;
+      --dark:#111;
+      --accent:#2E8B57;
+      --accent-dark:#256b4a;
+      --muted:#f4f6f8;
+      --card:#fff;
     }
 
-    *{ box-sizing:border-box; }
-
     body{
-        margin:0;
-        font-family:Arial, Helvetica, sans-serif;
-        background:var(--muted);
+      font-family: Arial, Helvetica, sans-serif;
+      background:var(--muted);
+      margin:0;
     }
 
     header{
-        background:var(--dark);
-        padding:14px;
-        color:white;
+      background:var(--dark);
+      color:#fff;
+      padding:14px 18px;
     }
 
     nav a{
-        margin-right:14px;
-        color:#ddd;
-        text-decoration:none;
-        font-weight:600;
+      color:#ccc;
+      text-decoration:none;
+      margin-right:14px;
     }
-    nav a:hover{ color:white; }
 
-    .container{
-        max-width:600px;
-        margin:30px auto;
-        background:var(--card);
-        padding:25px;
-        border-radius:8px;
-        box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    nav a:hover{
+      color:#fff;
+    }
+
+    main{
+      max-width:600px;
+      margin:30px auto;
+      background:#fff;
+      padding:20px;
+      border-radius:8px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.06);
     }
 
     h2{
-        color:var(--dark);
-        text-align:center;
-        margin-bottom:20px;
+      color:var(--dark);
+      margin-top:0;
     }
 
-    label{
-        display:block;
-        font-weight:700;
-        margin-top:10px;
-        margin-bottom:4px;
+    .info-box{
+      padding:12px;
+      background:#f7f7f7;
+      margin-bottom:16px;
+      border-radius:6px;
     }
 
-    input, select{
-        width:100%;
-        padding:10px;
-        border-radius:6px;
-        border:1px solid #ccc;
-        margin-bottom:10px;
-        font-size:16px;
-    }
-
-    .total{
-        background:#eef5ef;
-        padding:14px;
-        border-radius:6px;
-        text-align:center;
-        font-size:20px;
-        font-weight:700;
-        margin-bottom:18px;
-        border:1px solid var(--accent);
+    select, button{
+      width:100%;
+      padding:10px;
+      margin-top:12px;
+      border-radius:6px;
+      font-size:15px;
+      border:1px solid #ddd;
     }
 
     button{
-        width:100%;
-        padding:12px;
-        border:0;
-        border-radius:8px;
-        background:var(--accent);
-        font-size:18px;
-        color:white;
-        font-weight:700;
-        cursor:pointer;
+      background:var(--accent);
+      color:white;
+      border:0;
+      font-weight:700;
+      cursor:pointer;
     }
+
     button:hover{
-        background:var(--accent-dark);
+      background:var(--accent-dark);
     }
-
-    .section-title{
-        margin-top:18px;
-        font-weight:700;
-        font-size:18px;
-    }
-</style>
-
+  </style>
 </head>
+
 <body>
-
-<header>
+  <header>
     <nav>
-        <a href="index.html">Home</a>
-        <a href="product.html">Products</a>
-        <a href="cart.html">Cart</a>
-        <a href="payment.html">Payment</a>
+      <a href="index.html">Home</a>
+      <a href="product.html">Products</a>
+      <a href="cart.html">Cart</a>
+      <a href="payment.html">Payment</a>
     </nav>
-</header>
+  </header>
 
-<div class="container">
-    <h2>Complete Payment</h2>
+  <main>
+    <h2>Payment Details</h2>
 
-    <div class="total">
-        Total Payable: <span id="totalDisplay">Ksh 0</span>
+    <div class="info-box">
+      <strong>Email:</strong> <span id="emailDisplay"></span><br>
+      <strong>Total:</strong> Ksh <span id="totalDisplay"></span><br>
+      <strong>Items:</strong> <span id="itemCount"></span><br>
+      <strong>Date:</strong> <span id="dateDisplay"></span><br>
+      <strong>Time:</strong> <span id="timeDisplay"></span><br>
+      <strong>Transaction ID:</strong> <span id="txID"></span>
     </div>
 
-    <label>Choose Payment Method</label>
-    <select id="method" onchange="toggleMethod()">
-        <option value="mpesa">M-Pesa</option>
-        <option value="card">Credit/Debit Card</option>
+    <label><strong>Select Payment Method:</strong></label>
+    <select id="paymentMethod">
+      <option value="">-- Choose Method --</option>
+      <option value="M-Pesa">M-Pesa</option>
+      <option value="Visa Card">Visa Card</option>
+      <option value="Cash on Delivery">Cash on Delivery</option>
     </select>
 
-    <!-- M-Pesa Form -->
-    <div id="mpesaForm">
-        <label>Phone Number</label>
-        <input type="text" id="mpesaPhone" placeholder="e.g 0712345678">
-    </div>
+    <button onclick="completePayment()">Complete Payment</button>
+  </main>
 
-    <!-- Card Form -->
-    <div id="cardForm" style="display:none;">
-        <label>Card Number</label>
-        <input type="text" id="cardNumber" placeholder="1234 5678 2345 9012">
+  <script>
+    // Load data saved from cart
+    document.getElementById("emailDisplay").textContent = localStorage.getItem("checkout_email") || "Unknown";
+    document.getElementById("totalDisplay").textContent = localStorage.getItem("checkout_total") || "0";
 
-        <label>Expiry Date</label>
-        <input type="month" id="expiry">
+    // items count from cart
+    const cart = JSON.parse(localStorage.getItem("one_stop_cart")) || [];
+    document.getElementById("itemCount").textContent = cart.length;
 
-        <label>CVV</label>
-        <input type="password" id="cvv" placeholder="123">
-    </div>
+    // Date + Time fallback if user skipped cart
+    const date = new Date();
+    const d = date.toLocaleDateString();
+    const t = date.toLocaleTimeString();
+    localStorage.setItem("checkout_date", d);
+    localStorage.setItem("checkout_time", t);
 
-    <button onclick="processPayment()">Pay Now</button>
-</div>
+    document.getElementById("dateDisplay").textContent = d;
+    document.getElementById("timeDisplay").textContent = t;
 
-<script>
-    // Show the total saved from cart
-    let total = localStorage.getItem("checkout_total") || 0;
-    document.getElementById("totalDisplay").textContent = "Ksh " + total;
+    // Generate transaction ID
+    const tx = "TX" + Math.floor(Math.random() * 99999999);
+    localStorage.setItem("checkout_tx", tx);
+    document.getElementById("txID").textContent = tx;
 
-    function toggleMethod(){
-        let m = document.getElementById("method").value;
-        document.getElementById("mpesaForm").style.display = m === "mpesa" ? "block" : "none";
-        document.getElementById("cardForm").style.display = m === "card" ? "block" : "none";
+    function completePayment(){
+      const method = document.getElementById("paymentMethod").value;
+
+      if(method === ""){
+        alert("Please select a payment method first");
+        return;
+      }
+
+      // Store payment method
+      localStorage.setItem("checkout_payment_method", method);
+
+      // Store cart items for receipt
+      localStorage.setItem("checkout_items", JSON.stringify(cart));
+
+      // Redirect to receipt
+      window.location.href = "receipt.html";
     }
-
-    function processPayment(){
-        if(total <= 0){
-            alert("Your total is 0. Please add items.");
-            return;
-        }
-
-        let method = document.getElementById("method").value;
-
-        if(method === "mpesa"){
-            let phone = document.getElementById("mpesaPhone").value;
-            if(phone.length < 10){
-                alert("Enter valid M-Pesa number!");
-                return;
-            }
-        }
-
-        if(method === "card"){
-            let card = document.getElementById("cardNumber").value;
-            let cvv = document.getElementById("cvv").value;
-            if(card.length < 16 || cvv.length < 3){
-                alert("Enter valid card details!");
-                return;
-            }
-        }
-
-        // SAVE FOR RECEIPT
-        let receipt = {
-            orderId: "ORD-" + Math.floor(Math.random()*99999),
-            date: new Date().toLocaleString(),
-            total: total,
-            method: method.toUpperCase()
-        };
-        localStorage.setItem("last_receipt", JSON.stringify(receipt));
-
-        // Clear cart
-        localStorage.removeItem("one_stop_cart");
-
-        window.location.href = "receipt.html";
-    }
-</script>
+  </script>
 
 </body>
 </html>
