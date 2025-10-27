@@ -2,172 +2,174 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Receipt - ONE STOP</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Receipt - ONE STOP</title>
+
 <style>
-    body {
-        font-family: 'Segoe UI', sans-serif;
-        background: #f4f4f4;
-        margin: 0;
-        padding: 0;
-    }
+:root{
+  --dark:#111;
+  --accent:#2E8B57;
+  --muted:#f4f6f8;
+  --card:#ffffff;
+  --danger:#c0392b;
+}
 
-    .receipt-container {
-        width: 90%;
-        max-width: 600px;
-        background: #fff;
-        margin: 30px auto;
-        padding: 25px;
-        border-radius: 10px;
-        box-shadow: 0 0 8px rgba(0,0,0,0.2);
-    }
+body{
+  margin:0;
+  font-family: Arial, Helvetica, sans-serif;
+  background:var(--muted);
+  color:#222;
+}
 
-    h2 {
-        text-align: center;
-        color: #0a4ba3;
-        margin-bottom: 10px;
-    }
+header{
+  background:var(--dark);
+  padding:12px 16px;
+  color:#fff;
+  text-align:center;
+  font-size:1.2rem;
+  font-weight:bold;
+}
 
-    .section {
-        margin-bottom: 15px;
-        border-bottom: 1px solid #e8e8e8;
-        padding-bottom: 10px;
-    }
+.container{
+  max-width:600px;
+  background:var(--card);
+  margin:30px auto;
+  padding:22px;
+  border-radius:10px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
 
-    .section:last-child {
-        border: none;
-    }
+h2{
+  text-align:center;
+  color:var(--accent);
+}
 
-    .section p {
-        margin: 5px 0;
-        font-size: 14px;
-    }
+.info{
+  margin-bottom:15px;
+  background:#f7faf7;
+  padding:12px;
+  border-radius:8px;
+}
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-    }
+table{
+  width:100%;
+  border-collapse:collapse;
+}
 
-    th, td {
-        border-bottom: 1px solid #ddd;
-        padding: 8px 4px;
-        text-align: left;
-        font-size: 14px;
-    }
+th, td{
+  padding:10px;
+  border-bottom:1px solid #eee;
+}
 
-    th {
-        background: #0a4ba3;
-        color: white;
-    }
+th{
+  text-align:left;
+}
 
-    .total-display {
-        font-size: 18px;
-        font-weight: bold;
-        text-align: right;
-        margin-top: 10px;
-    }
+.total-box{
+  margin-top:15px;
+  font-size:1.2rem;
+  font-weight:bold;
+  text-align:right;
+  color:var(--accent);
+}
 
-    .thanks {
-        text-align: center;
-        margin-top: 25px;
-        color: #333;
-        font-size: 15px;
-    }
+.btn-area{
+  margin-top:20px;
+  display:flex;
+  justify-content:space-between;
+}
 
-    .buttons {
-        text-align: center;
-        margin-top: 20px;
-    }
+button{
+  padding:10px 16px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
+}
 
-    button {
-        background: #0a4ba3;
-        color: #fff;
-        border: none;
-        padding: 10px 25px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 15px;
-    }
+.print-btn{
+  background:var(--accent);
+  color:white;
+}
 
-    button:hover {
-        background: #083b82;
-    }
+.home-btn{
+  background:var(--dark);
+  color:white;
+}
+
+/* Mobile Responsive */
+@media(max-width:600px){
+  .btn-area{
+    flex-direction:column;
+    gap:10px;
+  }
+}
 </style>
 </head>
+
 <body>
+<header>ONE STOP RECEIPT</header>
 
-<div class="receipt-container">
-    <h2>Payment Receipt</h2>
+<div class="container">
+  <h2>Purchase Receipt</h2>
 
-    <div class="section">
-        <p><strong>Transaction ID:</strong> <span id="transactionID"></span></p>
-        <p><strong>Date:</strong> <span id="date"></span></p>
-    </div>
+  <div class="info">
+    <strong>Date:</strong> <span id="receiptDate"></span><br>
+    <strong>Payment Method:</strong> <span id="method"></span>
+  </div>
 
-    <div class="section">
-        <p><strong>Customer:</strong> <span id="customerName"></span></p>
-        <p><strong>Email:</strong> <span id="customerEmail"></span></p>
-        <p><strong>Payment Method:</strong> <span id="method"></span></p>
-    </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th style="width:80px;">Price</th>
+      </tr>
+    </thead>
+    <tbody id="receiptBody"></tbody>
+  </table>
 
-    <div class="section">
-        <table>
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>Price KSh</th>
-                </tr>
-            </thead>
-            <tbody id="receiptItems">
-            </tbody>
-        </table>
-    </div>
+  <div class="total-box" id="receiptTotal"></div>
 
-    <p class="total-display">Total: KSh <span id="totalAmount"></span></p>
-
-    <p class="thanks">Thank you for shopping with ONE STOP!</p>
-
-    <div class="buttons">
-        <button onclick="window.print()">Print Receipt</button>
-    </div>
-
+  <div class="btn-area">
+    <button class="print-btn" onclick="window.print()">Print Receipt</button>
+    <button class="home-btn" onclick="goHome()">Home</button>
+  </div>
 </div>
 
 <script>
-// Load stored values
-const name = localStorage.getItem("paymentName");
-const email = localStorage.getItem("paymentEmail");
-const method = localStorage.getItem("paymentMethod");
-const total = localStorage.getItem("cartTotal");
-const cartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
+function loadReceipt(){
+  const cart = JSON.parse(localStorage.getItem("one_stop_cart") || "[]");
+  const payment = JSON.parse(localStorage.getItem("one_stop_payment") || "{}");
+  const body = document.getElementById("receiptBody");
+  const totalEl = document.getElementById("receiptTotal");
+  const methodEl = document.getElementById("method");
+  const dateEl = document.getElementById("receiptDate");
 
-// Display customer info
-document.getElementById("customerName").innerText = name;
-document.getElementById("customerEmail").innerText = email;
-document.getElementById("method").innerText = method;
-document.getElementById("totalAmount").innerText = total;
+  body.innerHTML = "";
+  let total = 0;
 
-// Generate receipt items
-let receiptList = "";
-cartItems.forEach(prod => {
-    receiptList += `
-        <tr>
-            <td>${prod.name}</td>
-            <td>${prod.quantity}</td>
-            <td>KSh ${prod.price * prod.quantity}</td>
-        </tr>
+  cart.forEach(item=>{
+    total += Number(item.price);
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${item.name}</td>
+      <td>Ksh ${item.price}</td>
     `;
-});
-document.getElementById("receiptItems").innerHTML = receiptList;
+    body.appendChild(row);
+  });
 
-// Transaction ID
-document.getElementById("transactionID").innerText = "TXN" + Math.floor(Math.random() * 10000000);
+  totalEl.textContent = "Total Paid: Ksh " + total;
+  methodEl.textContent = payment.method || "N/A";
+  dateEl.textContent = new Date().toLocaleString();
+}
 
-// Timestamp
-const today = new Date();
-document.getElementById("date").innerText = today.toLocaleString();
+function goHome(){
+  // Clear cart after successful purchase
+  localStorage.setItem("one_stop_cart", "[]");
+  window.location.href = "index.html";
+}
+
+loadReceipt();
 </script>
 
 </body>
