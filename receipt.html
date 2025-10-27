@@ -13,14 +13,12 @@
   --card:#ffffff;
   --danger:#c0392b;
 }
-
 body{
   margin:0;
   font-family: Arial, Helvetica, sans-serif;
   background:var(--muted);
   color:#222;
 }
-
 header{
   background:var(--dark);
   padding:12px 16px;
@@ -29,7 +27,6 @@ header{
   font-size:1.2rem;
   font-weight:bold;
 }
-
 .container{
   max-width:650px;
   background:var(--card);
@@ -38,12 +35,7 @@ header{
   border-radius:10px;
   box-shadow:0 4px 12px rgba(0,0,0,0.12);
 }
-
-h2{
-  text-align:center;
-  color:var(--accent);
-}
-
+h2{text-align:center; color:var(--accent);}
 .info{
   margin-bottom:15px;
   background:#f7faf7;
@@ -51,21 +43,15 @@ h2{
   border-radius:8px;
   line-height:1.6;
 }
-
 table{
   width:100%;
   border-collapse:collapse;
 }
-
 th, td{
   padding:10px;
   border-bottom:1px solid #eee;
 }
-
-th{
-  text-align:left;
-}
-
+th{text-align:left;}
 .item-img{
   width:60px;
   height:60px;
@@ -74,7 +60,6 @@ th{
   margin-right:6px;
   border:2px solid #ddd;
 }
-
 .total-box{
   margin-top:15px;
   font-size:1.2rem;
@@ -82,26 +67,22 @@ th{
   text-align:right;
   color:var(--accent);
 }
-
 .invoice{
   font-size:0.9rem;
   margin-bottom:10px;
   color:#444;
 }
-
 .status{
   text-align:right;
   color:green;
   font-weight:bold;
   font-size:0.95rem;
 }
-
 .btn-area{
   margin-top:20px;
   display:flex;
   justify-content:space-between;
 }
-
 button{
   padding:10px 16px;
   border:none;
@@ -109,22 +90,10 @@ button{
   cursor:pointer;
   font-weight:bold;
 }
-
-.print-btn{
-  background:var(--accent);
-  color:white;
-}
-
-.home-btn{
-  background:var(--dark);
-  color:white;
-}
-
+.print-btn{ background:var(--accent); color:white; }
+.home-btn{ background:var(--dark); color:white; }
 @media(max-width:600px){
-  .btn-area{
-    flex-direction:column;
-    gap:10px;
-  }
+  .btn-area{ flex-direction:column; gap:10px; }
 }
 </style>
 </head>
@@ -166,11 +135,7 @@ button{
 
 <script>
 function loadReceipt(){
-  const cart = JSON.parse(localStorage.getItem("one_stop_cart") || "[]");
-  const payment = JSON.parse(localStorage.getItem("one_stop_payment") || "{}");
-  const email = localStorage.getItem("one_stop_email") || "Not Provided";
-  const savedTime = localStorage.getItem("one_stop_time") || new Date().toLocaleString();
-
+  const receipt = JSON.parse(localStorage.getItem("last_receipt") || "{}");
   const body = document.getElementById("receiptBody");
   const totalEl = document.getElementById("receiptTotal");
   const methodEl = document.getElementById("method");
@@ -179,33 +144,31 @@ function loadReceipt(){
   const trx = document.getElementById("trxId");
 
   body.innerHTML = "";
-  let total = 0;
+  if(!receipt.items || receipt.items.length===0){
+    body.innerHTML = `<tr><td colspan="2" style="text-align:center;">No items found</td></tr>`;
+  } else {
+    let total = 0;
+    receipt.items.forEach(item=>{
+      total += Number(item.price) * Number(item.qty);
+      const row = document.createElement("tr");
+      row.innerHTML = `<td><img src="${item.img}" class="item-img"> ${item.name}</td>
+                       <td>Ksh ${Number(item.price)*Number(item.qty)}</td>`;
+      body.appendChild(row);
+    });
+    totalEl.textContent = "Total Paid: Ksh " + total;
+  }
 
-  cart.forEach(item=>{
-    total += Number(item.price);
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td><img src="${item.img}" class="item-img"> ${item.name}</td>
-      <td>Ksh ${item.price}</td>
-    `;
-    body.appendChild(row);
-  });
-
-  totalEl.textContent = "Total Paid: Ksh " + total;
-  methodEl.textContent = payment.method || "N/A";
-  emailEl.textContent = email;
-  dateEl.textContent = savedTime;
-
-  trx.textContent = "TRX-" + Math.floor(Math.random()*999999);
+  methodEl.textContent = receipt.method || "N/A";
+  emailEl.textContent = receipt.email || "Not Provided";
+  dateEl.textContent = receipt.date || new Date().toLocaleString();
+  trx.textContent = receipt.orderId || "TRX-" + Math.floor(Math.random()*999999);
 }
 
 function goHome(){
-  localStorage.setItem("one_stop_cart", "[]");
   window.location.href = "index.html";
 }
 
 loadReceipt();
 </script>
-
 </body>
 </html>
