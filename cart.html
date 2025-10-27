@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Cart - ONE STOP</title>
 
-  <!-- Embedded CSS that follows same palette & standards -->
   <style>
     :root{
       --dark:#111;
@@ -43,11 +42,6 @@
     .btn-checkout{ background:var(--accent); color:white; }
 
     .summary{ margin-top:10px; display:flex; justify-content:flex-end; gap:20px; align-items:center; font-size:1.05rem; font-weight:700; }
-    @media (max-width:600px){
-      .cart-table thead{ display:none; }
-      .cart-table tr{ display:block; margin-bottom:12px; }
-      .cart-table td{ display:flex; justify-content:space-between; }
-    }
   </style>
 </head>
 <body>
@@ -69,13 +63,12 @@
       <thead>
         <tr>
           <th>Item</th>
-          <th style="width:140px;">Price</th>
+          <th>Qty</th>
+          <th>Price</th>
           <th style="width:120px;">Action</th>
         </tr>
       </thead>
-      <tbody id="cartBody">
-        <!-- rows inserted by JS -->
-      </tbody>
+      <tbody id="cartBody"></tbody>
     </table>
 
     <div class="summary">
@@ -92,59 +85,83 @@
     </div>
   </main>
 
-  <script>
-    const CART_KEY = 'one_stop_cart';
-    function getCart(){ try{ return JSON.parse(localStorage.getItem(CART_KEY)) || []; }catch(e){ return []; } }
-    function saveCart(c){ localStorage.setItem(CART_KEY, JSON.stringify(c)); renderCart(); }
 
-    function renderCart(){
-      const body = document.getElementById('cartBody');
-      const totalEl = document.getElementById('totalAmount');
-      const cart = getCart();
-      body.innerHTML = '';
-      let total = 0;
-      if(cart.length === 0){
-        body.innerHTML = `<tr><td colspan="3" style="padding:14px;text-align:center;">Your cart is empty.</td></tr>`;
-      } else {
-        cart.forEach(item => {
-          total += Number(item.price);
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td style="display:flex;gap:12px;align-items:center;">
-              <img src="${item.img}" class="cart-item-img" alt="${item.name}">
-              <div>
-                <div style="font-weight:700;">${item.name}</div>
-              </div>
-            </td>
-            <td>Ksh ${item.price}</td>
-            <td><button class="btn btn-remove" onclick="removeItem(${item.id})">Remove</button></td>
-          `;
-          body.appendChild(tr);
-        });
-      }
-      totalEl.textContent = 'Total: Ksh ' + total;
-    }
+<script>
+const CART_KEY = "one_stop_cart";
 
-    function removeItem(id){
-      let cart = getCart();
-      cart = cart.filter(i => i.id !== id);
-      saveCart(cart);
-    }
+// Get Cart
+function getCart(){
+  try{ return JSON.parse(localStorage.getItem(CART_KEY)) || []; }
+  catch(e){ return []; }
+}
 
-    function clearCart(){
-      if(!confirm('Clear entire cart?')) return;
-      saveCart([]);
-    }
+// Save Cart
+function saveCart(c){
+  localStorage.setItem(CART_KEY, JSON.stringify(c));
+  renderCart();
+}
 
-    function proceed(){
-      const cart = getCart();
-      if(cart.length === 0){ alert('Your cart is empty'); return; }
-      // redirect to payment page (you already have payment.html)
-      window.location.href = 'payment.html';
-    }
+// Render Cart
+function renderCart(){
+  const body = document.getElementById("cartBody");
+  const totalEl = document.getElementById("totalAmount");
+  const cart = getCart();
 
-    // init render on load
-    renderCart();
-  </script>
+  body.innerHTML = "";
+  let total = 0;
+
+  if(cart.length === 0){
+    body.innerHTML = `<tr><td colspan="4" style="padding:14px;text-align:center;">Your cart is empty.</td></tr>`;
+  } else {
+    cart.forEach(item => {
+      total += (Number(item.price) * Number(item.qty));
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td style="display:flex;gap:12px;align-items:center;">
+          <img src="${item.img}" class="cart-item-img" alt="${item.name}">
+          <div><div style="font-weight:700;">${item.name}</div></div>
+        </td>
+        <td>${item.qty}</td>
+        <td>Ksh ${item.price * item.qty}</td>
+        <td><button class="btn btn-remove" onclick="removeItem(${item.id})">Remove</button></td>
+      `;
+      body.appendChild(tr);
+    });
+  }
+
+  totalEl.textContent = "Total: Ksh " + total;
+
+  // Save total for payment page
+  localStorage.setItem("checkout_total", total);
+}
+
+// Remove item
+function removeItem(id){
+  let cart = getCart();
+  cart = cart.filter(i => i.id !== id);
+  saveCart(cart);
+}
+
+// Clear cart
+function clearCart(){
+  if(confirm("Clear entire cart?")){
+    saveCart([]);
+  }
+}
+
+// Proceed to payment
+function proceed(){
+  const cart = getCart();
+  if(cart.length === 0){ alert("Your cart is empty"); return; }
+  
+  // Save cart order for receipt
+  localStorage.setItem("checkout_cart", JSON.stringify(cart));
+  window.location.href = "payment.html";
+}
+
+// init render
+renderCart();
+</script>
 </body>
 </html>
