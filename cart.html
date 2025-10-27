@@ -141,6 +141,7 @@
 
       // save to payment page
       localStorage.setItem("checkout_total", total);
+      localStorage.setItem("checkout_items", JSON.stringify(cart));
     }
 
     function removeItem(id){
@@ -159,6 +160,22 @@
         alert("Your cart is empty"); 
         return; 
       }
+
+      // Ask for email before proceeding
+      let email = prompt("Enter your email to continue:");
+      if(!email || !email.includes("@")){
+        alert("Please enter a valid email.");
+        return;
+      }
+kk
+      // Save email
+      localStorage.setItem("checkout_email", email);
+
+      // Save date + time
+      let now = new Date();
+      localStorage.setItem("checkout_date", now.toLocaleDateString());
+      localStorage.setItem("checkout_time", now.toLocaleTimeString());
+
       window.location.href = "payment.html";
     }
 
