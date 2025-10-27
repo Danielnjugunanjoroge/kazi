@@ -1,146 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Payment - 3D TRADERS LIMITED</title>
-  <style>
-    body {
-      font-family: "Poppins", sans-serif;
-      background-color: #f9f9f9;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .payment-container {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      width: 400px;
-      padding: 25px;
-      text-align: center;
-    }
-    h2 {
-      color: #111;
-    }
-    input, select, button {
-      width: 90%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
-    button {
-      background: #333;
-      color: white;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover {
-      background: #ffcc00;
-      color: #111;
-    }
-    .hidden {
-      display: none;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Payment</title>
+<link rel="stylesheet" href="styles1.css">
+
+<style>
+.payment-box {
+    width: 80%;
+    margin: auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 8px #888;
+}
+.pay-option {
+    border: 1px solid #bbb;
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 6px;
+}
+.pay-option:hover {
+    border-color: #007bff;
+}
+label {
+    font-size: 17px;
+}
+input[type="text"], input[type="number"] {
+    width: 95%;
+    padding: 10px;
+    margin-top: 6px;
+    border-radius: 5px;
+    border: 1px solid #aaa;
+}
+button {
+    padding: 12px 15px;
+    background: #007bff;
+    border: none;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+button:hover {
+    background: #0056b3;
+}
+</style>
+
 </head>
+
 <body>
-  <div class="payment-container">
-    <h2>Payment Details</h2>
-    <p id="total"></p>
 
-    <!-- Step 1: Email Verification -->
-    <div id="step1">
-      <input type="email" id="email" placeholder="Enter your email" required>
-      <button onclick="verifyEmail()">Verify Email</button>
+<div class="payment-box">
+    <h2>Checkout - Complete Payment</h2>
+
+    <p>Total Amount: <b style="color:green;" id="totalAmount">Ksh 0</b></p>
+
+    <hr><br>
+
+    <label><input type="radio" name="method" value="mpesa"> Pay with M-Pesa</label>
+    <div id="mpesaForm" class="pay-option" style="display:none;">
+        <label>Enter Phone Number:</label>
+        <input type="text" id="mpesaPhone" placeholder="0712 345 678">
     </div>
 
-    <!-- Step 2: Payment Method -->
-    <div id="step2" class="hidden">
-      <label>Select Payment Method:</label><br>
-      <select id="method">
-        <option value="">--Choose--</option>
-        <option value="mpesa">M-Pesa</option>
-        <option value="bank">Bank</option>
-      </select>
-      <button onclick="proceedToNumber()">Proceed</button>
+    <br>
+    <label><input type="radio" name="method" value="card"> Pay with Credit/Debit Card</label>
+    <div id="cardForm" class="pay-option" style="display:none;">
+
+        <label>Card Holder Name:</label>
+        <input type="text" id="cardName" placeholder="Full Name">
+
+        <label>Card Number:</label>
+        <input type="number" id="cardNumber" placeholder="Enter 16 digits">
+
+        <label>Expiry Date:</label>
+        <input type="text" id="expiry" placeholder="MM/YY">
+
+        <label>CVV:</label>
+        <input type="number" id="cvv" placeholder="3 digits">
     </div>
 
-    <!-- Step 3: Number Entry -->
-    <div id="step3" class="hidden">
-      <label id="numberLabel">Enter your number:</label><br>
-      <input type="text" id="number" placeholder="Enter your Mpesa or Bank number">
-      <button onclick="completeTransaction()">Complete Payment</button>
-    </div>
-  </div>
+    <br><hr><br>
 
-  <script>
-    const totalDisplay = document.getElementById("total");
-    const step1 = document.getElementById("step1");
-    const step2 = document.getElementById("step2");
-    const step3 = document.getElementById("step3");
-    const numberLabel = document.getElementById("numberLabel");
-    const total = localStorage.getItem("cartTotal") || 0;
+    <button onclick="completePayment()">Complete Payment</button>
+</div>
 
-    totalDisplay.textContent = `Total Amount: Ksh ${total}`;
+<script>
+// Display saved cart total
+document.addEventListener("DOMContentLoaded", () => {
+    let total = localStorage.getItem("cartTotal");
+    if(total !== null){
+        document.getElementById("totalAmount").innerHTML = "Ksh " + total;
+    }
+});
 
-    // ✅ Step 1: Verify Email
-    function verifyEmail() {
-      const email = document.getElementById("email").value.trim();
-      const emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+// Toggle sections
+document.querySelectorAll('input[name="method"]').forEach(e => {
+    e.addEventListener("change", () => {
+        if(e.value == "mpesa"){
+            mpesaForm.style.display = "block";
+            cardForm.style.display = "none";
+        } else {
+            cardForm.style.display = "block";
+            mpesaForm.style.display = "none";
+        }
+    });
+});
 
-      if (!email.match(emailPattern)) {
-        alert("⚠️ Please enter a valid email address!");
+function completePayment(){
+    let method = document.querySelector('input[name="method"]:checked');
+
+    if(!method){
+        alert("Please select a payment method!");
         return;
-      }
-
-      alert("✅ Email verified successfully!");
-      step1.classList.add("hidden");
-      step2.classList.remove("hidden");
     }
 
-    // ✅ Step 2: Choose Method
-    function proceedToNumber() {
-      const method = document.getElementById("method").value;
-      if (method === "") {
-        alert("Please select a payment method first!");
-        return;
-      }
-
-      if (method === "mpesa") {
-        numberLabel.textContent = "Enter your M-Pesa number:";
-        document.getElementById("number").placeholder = "07XXXXXXXX";
-      } else {
-        numberLabel.textContent = "Enter your Bank Account number:";
-        document.getElementById("number").placeholder = "Bank Account Number";
-      }
-
-      alert(`You chose ${method.toUpperCase()} method.`);
-      step2.classList.add("hidden");
-      step3.classList.remove("hidden");
+    if(method.value === "mpesa"){
+        let phone = document.getElementById("mpesaPhone").value;
+        if(phone.length < 10){
+            alert("Enter a valid phone number!");
+            return;
+        }
+        alert("M-Pesa prompt sent to " + phone + ".");
     }
 
-    // ✅ Step 3: Complete Payment
-    function completeTransaction() {
-      const number = document.getElementById("number").value.trim();
-      if (number === "" || number.length < 6) {
-        alert("⚠️ Enter a valid number to proceed!");
-        return;
-      }
+    if(method.value === "card"){
+        let card = document.getElementById("cardNumber").value;
+        let cvv = document.getElementById("cvv").value;
 
-      alert(`A confirmation message has been sent to ${number}.
-Please enter your PIN to complete payment of Ksh ${total}.`);
-      setTimeout(() => {
-        alert("✅ Transaction completed successfully! Thank you for shopping with 3D TRADERS LIMITED.");
-        localStorage.removeItem("cartTotal");
-        window.location.href = "index.html";
-      }, 2000);
+        if(card.length < 16){
+            alert("Invalid Card Number!");
+            return;
+        }
+        if(cvv.length < 3){
+            alert("Invalid CVV!");
+            return;
+        }
+
+        alert("Card payment successful!");
     }
-  </script>
+
+    // Clear cart after payment
+    localStorage.removeItem("one_stop_cart");
+    localStorage.removeItem("cartTotal");
+
+    setTimeout(() => {
+        window.location.href = "front.html";
+    }, 1500);
+}
+
+</script>
+
 </body>
 </html>
