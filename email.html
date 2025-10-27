@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enter Email</title>
+
+  <style>
+    body {
+      background:#0e1a38;
+      color:white;
+      font-family: Arial;
+      text-align:center;
+      padding-top:80px;
+    }
+    .box{
+      background:#13254f;
+      padding:20px;
+      border-radius:10px;
+      width:90%;
+      max-width:350px;
+      margin:auto;
+      box-shadow: 0px 0px 10px black;
+    }
+    input {
+      width:90%;
+      padding:10px;
+      border:none;
+      border-radius:6px;
+      margin-top:15px;
+    }
+    button{
+      width:90%;
+      padding:10px;
+      border:none;
+      border-radius:6px;
+      background:#40afff;
+      margin-top:15px;
+      cursor:pointer;
+      font-weight:bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>Verify Email</h2>
+  <p>Please enter your email to continue payment</p>
+  <input type="email" id="emailInput" placeholder="example@mail.com" required>
+  <button onclick="saveEmail()">Continue</button>
+</div>
+
+<script>
+function saveEmail(){
+  const email = document.getElementById("emailInput").value;
+
+  if(!email){
+    alert("Please enter your email!");
+    return;
+  }
+
+  // Save email to localStorage
+  localStorage.setItem("email", email);
+
+  // Move to payment
+  window.location.href = "payment.html";
+}
+</script>
+
+</body>
+</html>
