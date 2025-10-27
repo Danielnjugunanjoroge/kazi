@@ -42,6 +42,7 @@
     .btn-checkout{ background:var(--accent); color:white; }
 
     .summary{ margin-top:10px; display:flex; justify-content:flex-end; gap:20px; align-items:center; font-size:1.05rem; font-weight:700; }
+
     @media (max-width:600px){
       .cart-table thead{ display:none; }
       .cart-table tr{ display:block; margin-bottom:12px; }
@@ -73,8 +74,7 @@
           <th style="width:120px;">Action</th>
         </tr>
       </thead>
-      <tbody id="cartBody">
-      </tbody>
+      <tbody id="cartBody"></tbody>
     </table>
 
     <div class="summary">
@@ -139,7 +139,6 @@
 
       totalEl.textContent = "Total: Ksh " + total;
 
-      // save to payment page
       localStorage.setItem("checkout_total", total);
       localStorage.setItem("checkout_items", JSON.stringify(cart));
     }
@@ -161,21 +160,22 @@
         return; 
       }
 
-      // Ask for email before proceeding
+      // Email Request
       let email = prompt("Enter your email to continue:");
       if(!email || !email.includes("@")){
         alert("Please enter a valid email.");
         return;
       }
-kk
+
       // Save email
       localStorage.setItem("checkout_email", email);
 
-      // Save date + time
+      // Save Date + Time
       let now = new Date();
       localStorage.setItem("checkout_date", now.toLocaleDateString());
       localStorage.setItem("checkout_time", now.toLocaleTimeString());
 
+      // Proceed to Payment Page
       window.location.href = "payment.html";
     }
 
